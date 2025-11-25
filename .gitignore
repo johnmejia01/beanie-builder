@@ -1,0 +1,15 @@
+# Output directory
+build
+build/*
+build/.cache/*
+dump
+dump/*
+
+#Add the following for when you decide to open source this project
+
+blueprint-config
+blueprint-config/*
+blueprints-kickstarts
+blueprints-kickstarts/*
+blueprints
+blueprints/*
