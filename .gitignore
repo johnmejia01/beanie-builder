@@ -9,7 +9,9 @@ dump/*
 
 blueprint-config
 blueprint-config/*
-blueprints-kickstarts
-blueprints-kickstarts/*
+blueprint-kickstarts
+blueprint-kickstarts/*
 blueprints
 blueprints/*
+blueprint-services
+blueprint-services/*
