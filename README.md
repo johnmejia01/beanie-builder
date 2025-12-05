@@ -91,7 +91,15 @@ image-type: minimal-installer
 arch: x86_64
 ```
 
-**Available image types for fedora-43 distro:**
+**Configuration keys:**
+
+- **`distro`** - Specifies the target distribution and version to build. Common values include `fedora-43`, `fedora-42`, `rhel-9`, `rhel-10`, etc. The distribution must be supported by OSBuild. Check available distributions in the [OSBuild documentation](https://osbuild.org/docs/user-guide/image-descriptions/).
+
+- **`image-type`** - Defines the type of output image to generate. The available image types depend on the selected distribution. Common types include installer images (ISO files), disk images (raw, qcow2), and cloud images (ami, vhd, etc.).
+
+- **`arch`** - Specifies the target architecture for the image. Common values are `x86_64` (64-bit Intel/AMD), `aarch64` (ARM 64-bit), `ppc64le` (PowerPC 64-bit little-endian), and `s390x` (IBM Z). The architecture must be supported by both the distribution and OSBuild.
+
+**Available image types for fedora-43 distro (for instance):**
 - `minimal-installer` - Installation ISO with minimal packages that does not include a desktop environment.
 - `minimal-raw-zst` - Minimal raw disk image in .zst compressed that's similar to "minimal-installer" image-type but without the installer.
 - `workstation-live-installer` - Installation ISO that includes the GNOME desktop environment, taliored for workstations.
