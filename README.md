@@ -15,7 +15,7 @@ Beanie Builder is a tool for building custom OS images using [OSBuild](https://w
 
 ## Prerequisites
 
-- Fedora or RHEL-based Linux distribution
+- Host must be running on a Fedora or other RHEL-based Linux distribution OS.
 - sudo/root access for installing dependencies
 - `just` command runner (installed during setup)
 
@@ -91,11 +91,10 @@ image-type: minimal-installer
 arch: x86_64
 ```
 
-**Available image types:**
-- `minimal-installer` - Installation ISO
-- `raw` - Raw disk image
-- `qcow2` - QEMU disk image
-- `ami` - Amazon Machine Image
+**Available image types for fedora-43 distro:**
+- `minimal-installer` - Installation ISO with minimal packages that does not include a desktop environment.
+- `minimal-raw-zst` - Minimal raw disk image in .zst compressed that's similar to "minimal-installer" image-type but without the installer.
+- `workstation-live-installer` - Installation ISO that includes the GNOME desktop environment, taliored for workstations.
 - And more (see [OSBuild documentation](https://osbuild.org/docs/user-guide/image-descriptions/fedora-43))
 
 ### Step 3: Define Your Blueprint
@@ -225,7 +224,7 @@ ssh_key = "ssh-rsa AAAAB3NzaC1yc2E..."
 
 ### Files
 
-Files can be added directly in the blueprint (automatically handled by the prepare script):
+Files can be added directly in the blueprint:
 
 ```toml
 [[customizations.files]]
@@ -286,7 +285,7 @@ For installer images:
 just run-image my-workstation
 ```
 
-This will launch QEMU with the installer ISO.
+This will launch QEMU with the installer ISO or other image build.
 
 ## Workflow Commands
 
@@ -310,25 +309,33 @@ This will launch QEMU with the installer ISO.
 For complete blueprint syntax and available customizations, refer to the official OSBuild documentation:
 
 - **OSBuild Homepage**: https://www.osbuild.org/
-- **User Guide**: https://www.osbuild.org/guides/user-guide/
-- **Creating Custom Images**: https://www.osbuild.org/guides/user-guide/creating-custom-images.html
-- **Blueprint Schema Reference**: https://osbuild.org/schemas/
-- **Customizations Reference**: https://www.osbuild.org/guides/user-guide/customizations.html
+- **User Guide**: https://osbuild.org/docs/user-guide/introduction/
+- **Image Descriptions**: https://osbuild.org/docs/user-guide/image-descriptions/
+- **Blueprint Schema Reference**: https://osbuild.org/docs/user-guide/blueprint-reference/
+- **Customizations Reference**: https://osbuild.org/docs/user-guide/blueprint-reference/#customizations
 
 ### Kickstart Documentation
 
 For kickstart file syntax and options:
 
-- **Fedora Kickstart Documentation**: https://docs.fedoraproject.org/en-US/fedora/latest/install-guide/advanced/Kickstart_Installations/
-- **RHEL Kickstart Documentation**: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-syntax-reference_installing-rhel-as-an-experienced-user
+- **Fedora Kickstart Documentation**: https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/
 - **Kickstart Options Reference (pykickstart)**: https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html
 
 ## Example: Complete Blueprint
 
-Here's a complete example blueprint for a development workstation:
+Here's a complete example blueprint for a development workstation with KDE Plasma Desktop Environment added:
 
 **`blueprints/dev-workstation.toml`**
 ```toml
+# Base packages
+[[packages]]
+name = "kernel"
+version = "6.17.*"
+
+[[packages]]
+name = "systemd"
+version = "*"
+
 # Development tools
 [[packages]]
 name = "git"
@@ -346,6 +353,32 @@ version = "*"
 name = "make"
 version = "*"
 
+# KDE Plasma 6 desktop environment
+[[packages]]
+name = "@kde-desktop-environment"
+
+[[packages]]
+name = "plasma-oxygen"
+version = "*"
+
+[[packages]]
+name = "plasma-milou"
+version = "*"
+
+# Packages needed for support Power Management Service (required in Desktop/Laptop machines)
+[[packages]]
+name = "power-profiles-daemon"
+version = "*"
+
+[[packages]]
+name = "upower"
+version = "*"
+
+# Essential system tools
+[[packages]]
+name = "firewalld"
+version = "*"
+
 # System configuration
 [customizations.timezone]
 timezone = "UTC"
@@ -354,18 +387,12 @@ timezone = "UTC"
 languages = ["en_US.UTF-8"]
 keyboard = "us"
 
-# Create developer user
-[[customizations.user]]
-name = "developer"
-password = "$6$rounds=656000$..."  # Use mkpasswd or similar
-groups = ["wheel", "docker"]
-ssh_key = "ssh-rsa AAAAB3NzaC1yc2E... developer@example.com"
 ```
 
 **`blueprint-config/dev-workstation.yaml`**
 ```yaml
 distro: fedora-43
-image-type: qcow2
+image-type: minimal-installer
 arch: x86_64
 ```
 
@@ -379,8 +406,13 @@ just build dev-workstation
 ### Build Fails
 
 - Check that all required packages exist in the repository
-- Verify blueprint syntax with `just validate-blueprint-config <name>`
+- Verify that the base image is available to use with `just validate-blueprint-config <name>`. Unsupported versions of the OSs will no longer be available to use, thus the `distro` key in your blueprint config will need to be updated to the next supported OS distro.
 - Check kickstart syntax with `just validate-kickstarts <name>`
+- If you are building a raw or other disk images instead of an installer, make sure to add the following in your blueprint set disk size. (By default, the disk image size is 4GB and build will fail if the image size exceeds it.):
+  ```
+  [customizations.disk]
+  minsize = "12 GiB"
+  ```
 
 ### Services Not Starting
 
