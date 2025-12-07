@@ -20,7 +20,8 @@ if [ "$(uname -s)" == "Linux" ]; then
             python3-pip \
             zstd \
             pykickstart \
-            just
+            just \
+            bats
         
         # Install mise
         sudo dnf copr enable jdxcode/mise

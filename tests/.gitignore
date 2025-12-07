@@ -1,0 +1,8 @@
+# Bats test helper libraries (should be installed via setup)
+test_helper/bats-support/
+test_helper/bats-assert/
+test_helper/bats-file/
+
+# Test fixtures (if any)
+fixtures/
+
