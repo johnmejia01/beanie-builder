@@ -82,3 +82,4 @@ fi
 
 echo ""
 echo "All kickstart files validated successfully!"
+exit 0
