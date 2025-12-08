@@ -245,25 +245,47 @@ EOF
   [ $status -ne 0 ]
 }
 
-#@test "build-image: handles relative and absolute paths correctly" {
-#  mkdir -p "output"
-#  mkdir -p "cache"
-#  touch "blueprint.toml"
+@test "build-image: handles relative and absolute paths correctly" {
+  mkdir -p "output"
+  mkdir -p "cache"
+  touch "blueprint.toml"
+  
+  # Skip if image-builder is available to avoid actual execution
+  # The script uses sudo which makes mocking difficult
+  if command -v image-builder >/dev/null 2>&1; then
+    skip "image-builder is available, skipping to avoid actual execution"
+  fi
+  
+  # Create a mock image-builder that just exits successfully
+  cat > "mock-image-builder" <<'EOF'
+#!/usr/bin/env bash
+echo "Mock image-builder called"
+exit 0
+EOF
+  chmod +x "mock-image-builder"
+  
+  # Add mock to PATH
+  PATH="$TEST_TMPDIR:$PATH"
   
   # Test with relative paths
-#  run_script "build-image.sh" \
-#    --base-image "minimal-installer" \
-#    --blueprint "./blueprint.toml" \
-#    --output-dir "./output" \
-#    --cache-dir "./cache" \
-#    --arch "x86_64" \
-#    --distro "fedora-43" \
-#    --image-name "test"
+  run_script "build-image.sh" \
+    --image-builder-cmd "mock-image-builder" \
+    --base-image "minimal-installer" \
+    --blueprint "./blueprint.toml" \
+    --output-dir "./output" \
+    --cache-dir "./cache" \
+    --arch "x86_64" \
+    --distro "fedora-43" \
+    --image-name "test"
   
   # Should not fail on parameter validation
-#  if [[ "$output" == *"Missing required parameters"* ]]; then
-#    echo "Unexpected: Missing required parameters error"
-#    return 1
-#  fi
-#}
+  if [[ "$output" == *"Missing required parameters"* ]]; then
+    echo "Unexpected: Missing required parameters error"
+    return 1
+  fi
+  
+  # The script should fail when trying to run sudo, not on parameter validation
+  # This confirms all parameters were accepted
+  [ $status -ne 0 ]
+}
 
