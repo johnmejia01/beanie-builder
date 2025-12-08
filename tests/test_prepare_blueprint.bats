@@ -134,7 +134,7 @@ load test_helper
   
   # Check that packages are preserved
   if command -v tomlq >/dev/null 2>&1; then
-    run tomlq -r '.[[packages]][].name' "build/test-blueprint/test-blueprint.toml"
+    run tomlq -r '.packages[].name' "build/test-blueprint/test-blueprint.toml"
     assert_output --partial "kernel"
   fi
 }
