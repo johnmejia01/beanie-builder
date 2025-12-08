@@ -24,7 +24,8 @@ load test_helper
   run_script "validate-kickstarts.sh" --blueprint-path "blueprints/test-blueprint.toml"
   
   # May succeed or fail depending on kickstart content, but should not crash
-  assert [ $status -eq 0 ] || [ $status -eq 1 ]
+  # Status should be 0 (success) or 1 (validation failure), but not other errors
+  [ $status -eq 0 ] || [ $status -eq 1 ]
 }
 
 @test "validate-kickstarts: handles missing kickstart file gracefully" {
@@ -34,7 +35,8 @@ load test_helper
   run_script "validate-kickstarts.sh" --blueprint-path "blueprints/test-blueprint.toml"
   
   # Should handle missing kickstart gracefully (may skip or succeed)
-  assert [ $status -eq 0 ] || [ $status -eq 1 ]
+  # Status should be 0 (success - no kickstart to validate) or 1 (validation failure)
+  [ $status -eq 0 ] || [ $status -eq 1 ]
 }
 
 @test "validate-kickstarts: validates global kickstart file" {
@@ -54,7 +56,8 @@ EOF
   run_script "validate-kickstarts.sh" --blueprint-path "blueprints/test-blueprint.toml"
   
   # Should process global kickstart
-  assert [ $status -eq 0 ] || [ $status -eq 1 ]
+  # Status should be 0 (success) or 1 (validation failure)
+  [ $status -eq 0 ] || [ $status -eq 1 ]
 }
 
 @test "validate-kickstarts: fails when ksvalidator is not available" {
