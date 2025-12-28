@@ -1,0 +1,19 @@
+name: Enforce CHANGELOG.md update requirement
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure CHANGELOG.md update requirement is met
+        run: |
+          git fetch origin main
+          if ! git diff --name-only origin/main...HEAD | grep -q CHANGELOG.md; then
+            echo "CHANGELOG.md update requirement is not met. Please update CHANGELOG.md."
+            exit 1
+          fi
+          echo "CHANGELOG.md update requirement is met"
