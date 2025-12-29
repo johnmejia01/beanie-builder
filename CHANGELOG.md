@@ -12,7 +12,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - Implementation of a unit test framework using BATS with the following unit tests implemented for each bash script:
-    - test_begin_build_image.bats (for begin-build-image.sh)
+    - test_begin_build_image.bats (for `begin-build-image.sh`)
         - begin-build-image: requires --blueprint-dir argument
         - begin-build-image: fails when blueprint directory does not exist
         - begin-build-image: fails when blueprint file does not exist
@@ -22,7 +22,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         - begin-build-image: calls build-image.sh with correct parameters
         - begin-build-image: passes correct blueprint file path to build-image.sh
         - begin-build-image: handles blueprint directory with special characters in name
-    - test_build_image.bats (for build-image.sh)
+    - test_build_image.bats (for `build-image.sh`)
         - build-image: requires all required parameters
         - build-image: fails when --base-image is missing
         - build-image: fails when --blueprint is missing
@@ -38,13 +38,13 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         - build-image: does not decompress non-zst image types (skipped: Requires full execution mocking)
         - build-image: validates all required parameters are present (skipped: image-builder is available, skipping to avoid actual execution)
         - build-image: handles relative and absolute paths correctly (skipped: image-builder is available, skipping to avoid actual execution)
-    - test_clean.bats (for clean.sh)
+    - test_clean.bats (for `clean.sh`)
         - clean: requires --blueprint and --output-dir arguments
         - clean: removes contents of blueprint build directory
         - clean: fails when blueprint directory does not exist
         - clean: only removes contents of specified blueprint directory
         - clean: preserves cache directory
-    - test_create_blueprint.bats (for create_blueprint.sh)
+    - test_create_blueprint.bats (for `create_blueprint.sh`)
         - create-blueprint: requires --blueprint-name argument
         - create-blueprint: creates blueprint structure with valid name
         - create-blueprint: creates empty blueprint TOML file
@@ -52,7 +52,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         - create-blueprint: handles blueprint name with special characters
         - create-blueprint: creates directories even if they already exist
         - create-blueprint: fails with invalid option
-    - test_prepare_blueprint.bats (for prepare_blueprint.sh)
+    - test_prepare_blueprint.bats (for `prepare_blueprint.sh`)
         - prepare-blueprint: requires blueprint path argument
         - prepare-blueprint: fails when blueprint file does not exist
         - prepare-blueprint: fails when tomlq is not available (skipped: tomlq is available, cannot test missing dependency)
@@ -62,7 +62,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         - prepare-blueprint: includes kickstart for installer image types
         - prepare-blueprint: includes services from blueprint-services/all directory
         - prepare-blueprint: preserves original blueprint packages
-    - test_prepare_blueprint_config.bats (for prepare_blueprint_config.sh)
+    - test_prepare_blueprint_config.bats (for `prepare_blueprint_config.sh`)
         - prepare-blueprint-config: requires --blueprint-name argument
         - prepare-blueprint-config: creates mise.toml in build directory
         - prepare-blueprint-config: includes distro in mise.toml
@@ -71,7 +71,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         - prepare-blueprint-config: fails when config file does not exist
         - prepare-blueprint-config: uses custom config-root directory
         - prepare-blueprint-config: fails when yq is not available (skipped: yq is available, cannot test missing dependency)
-    - test_validate_blueprint_config.bats (for validate_blueprint_config.sh)
+    - test_validate_blueprint_config.bats (for `validate_blueprint_config.sh`)
         - validate-blueprint-config: requires --blueprint-name argument
         - validate-blueprint-config: fails when config file does not exist
         - validate-blueprint-config: fails when config file is missing required fields (image-type)
@@ -80,7 +80,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
         - validate-blueprint-config: validates complete config file structure
         - validate-blueprint-config: uses custom config-root directory
         - validate-blueprint-config: checks for yq command (skipped: yq is available, cannot test missing dependency)
-    - test_validate_kickstarts.bats (for validate_kickstarts.sh)
+    - test_validate_kickstarts.bats (for `validate_kickstarts.sh`)
         - validate-kickstarts: requires --blueprint-path argument
         - validate-kickstarts: validates valid kickstart file
         - validate-kickstarts: handles missing kickstart file gracefully
