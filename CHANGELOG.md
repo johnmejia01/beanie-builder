@@ -8,7 +8,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [v0.1.0-alpha.2] - 2025-12-28
+## [v0.1.0-alpha.3] - 2025-12-28
 
 ### Added
 - Implementation of a unit test framework using BATS with the following unit tests implemented for each bash script:
