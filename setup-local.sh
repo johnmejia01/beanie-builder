@@ -19,9 +19,9 @@ if [ "$(uname -s)" == "Linux" ]; then
             edk2-ovmf \
             python3-pip \
             zstd \
-            pykickstart \
             just \
-            bats
+            bats \
+            podman
         
         # Install mise
         sudo dnf copr enable jdxcode/mise
@@ -46,7 +46,7 @@ if [ "$(uname -s)" == "Linux" ]; then
                 yq \
                 python3-pip \
                 zstd \
-                #python3-kickstart (Use mise to install kickstart)\
+                podman \
                 just \
                 bats
             
@@ -75,6 +75,7 @@ if [ "$(uname -s)" == "Linux" ]; then
                     exit 1
                 fi
             fi
+
         else
             echo "Error: Beanie Builder is only supported on Fedora, CentOS, or other Red Hat-based distribution, or Debian/Ubuntu-based distributions"
             exit 1
@@ -88,8 +89,20 @@ else
     exit 1
 fi
 
-# Install tomlq
-pip install tomlq
+# Install python using mise
+mise install python
+mise use python
+
+eval "$(mise activate bash)"
+
+#Verify that python is referenced from the mise-managed path
+if [ "$(which python)" != "$(mise which python)" ]; then
+    echo "Error: python is not referenced from the mise-managed path"
+    exit 1
+fi
+
+#Install tomlq and pykickstart using pip
+pip install tomlq pykickstart
 
 echo ""
 echo "Setup complete! You can now build Linux OS Images."
