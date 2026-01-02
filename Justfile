@@ -3,11 +3,11 @@
 # Variables
 blueprint_config_dir := "blueprint-config"
 prepare_blueprint_script := "scripts/prepare-blueprint.sh"
-validate_blueprint_config_script := "scripts/validate-blueprint-config.sh"
 validate_kickstarts_script := "scripts/validate-kickstarts.sh"
 prepare_blueprint_config_script := "scripts/prepare-blueprint-config.sh"
 create_blueprint_script := "scripts/create-blueprint.sh"
 begin_build_image_script := "scripts/begin-build-image.sh"
+begin_validate_blueprint_config_script := "scripts/begin-validate-blueprint-config.sh"
 clean_script := "scripts/clean.sh"
 prep_vm_script := "scripts/prep-vm.sh"
 run_image_script := "scripts/run-image.sh"
@@ -28,7 +28,7 @@ create-blueprint blueprint:
 # Validate the blueprint config
 validate-blueprint-config blueprint:
     #!/usr/bin/env bash
-    {{validate_blueprint_config_script}} --blueprint-name "{{blueprint}}" --config-root {{blueprint_config_dir}}
+    {{begin_validate_blueprint_config_script}} --blueprint-name "{{blueprint}}" --config-root {{blueprint_config_dir}}
 
 # Validate the kickstart files
 validate-kickstarts blueprint:
