@@ -61,12 +61,39 @@ set -u
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_IMAGE_SCRIPT="$ROOT_DIR/scripts/build-image.sh"
 
-#Call the build-image script
-"$BUILD_IMAGE_SCRIPT" --image-builder-cmd "image-builder" \
-  --blueprint "$BLUEPRINT_FILE" \
-  --output-dir "$BLUEPRINT_DIR" \
-  --cache-dir "build/cache" \
-  --arch "$ARCH" \
-  --distro "$DISTRO" \
-  --base-image "$IMAGE_TYPE" \
-  --image-name "$(basename "$BLUEPRINT_DIR")"
+#Check if the operating system is Fedora, CentOS, or other Red Hat-based distribution
+if [ -f /etc/redhat-release ]; then
+  #Call the build-image script
+  "$BUILD_IMAGE_SCRIPT" --image-builder-cmd "image-builder" \
+    --blueprint "$BLUEPRINT_FILE" \
+    --output-dir "$BLUEPRINT_DIR" \
+    --cache-dir "build/cache" \
+    --arch "$ARCH" \
+    --distro "$DISTRO" \
+    --base-image "$IMAGE_TYPE" \
+    --image-name "$(basename "$BLUEPRINT_DIR")"
+else
+  #Call the build-image script using podman
+  "$BUILD_IMAGE_SCRIPT" --image-builder-cmd "podman run --privileged -v ./build:/output -v '$BLUEPRINT_FILE':/'$(basename "$BLUEPRINT_FILE")' ghcr.io/osbuild/image-builder-cli:latest"\
+    --blueprint "$(basename "$BLUEPRINT_FILE")" \
+    --output-dir "/output/$(basename "$BLUEPRINT_DIR")" \
+    --cache-dir "/output/cache" \
+    --arch "$ARCH" \
+    --distro "$DISTRO" \
+    --base-image "$IMAGE_TYPE" \
+    --image-name "$(basename "$BLUEPRINT_DIR")"
+
+  #sudo podman run --privileged \
+  # -v ./build:/output \
+  # -v ./build/test/test.toml:/test.toml \
+  # ghcr.io/osbuild/image-builder-cli:latest \
+  # build \
+  # --distro fedora-43 \
+  # --arch x86_64 \
+  # --cache /output/cache \
+  # --progress=verbose \
+ #  --blueprint=/test.toml \
+ #  --output-dir=/output/test2 \
+ #  --output-name=test2 \
+ #  minimal-installer
+fi

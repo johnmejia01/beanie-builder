@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+eval "$(mise activate bash)"
 
 if [ "$#" -lt 1 ]; then
   echo "Usage: $0 <blueprint-path> [output-path]" >&2
