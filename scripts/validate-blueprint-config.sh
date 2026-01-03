@@ -48,9 +48,10 @@ if ! command -v yq >/dev/null 2>&1; then
   exit 1
 fi
 
-# Check if image-builder command is available
-if ! command -v "$IMAGE_BUILDER_CMD" >/dev/null 2>&1; then
-  echo "Error: $IMAGE_BUILDER_CMD is required but not installed." >&2
+# Check if image-builder command is available (check only the first word of the command)
+FIRST_CMD="${IMAGE_BUILDER_CMD%% *}"
+if ! command -v "$FIRST_CMD" >/dev/null 2>&1; then
+  echo "Error: $FIRST_CMD (from $IMAGE_BUILDER_CMD) is required but not installed." >&2
   exit 1
 fi
 
@@ -85,11 +86,11 @@ echo "  image-type: $IMAGE_TYPE"
 echo "  arch: $ARCH"
 
 # Check if image exists using image-builder list with filters
-LIST_OUTPUT="$("$IMAGE_BUILDER_CMD" list \
+LIST_OUTPUT=`$IMAGE_BUILDER_CMD list \
   --filter "distro:$DISTRO" \
   --filter "arch:$ARCH" \
   --filter "type:$IMAGE_TYPE" \
-  --format json 2>&1)"
+  --format json 2>&1`
 
 # Check if the command succeeded and returned results
 if [ $? -ne 0 ]; then
