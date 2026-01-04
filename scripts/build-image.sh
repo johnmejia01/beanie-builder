@@ -74,7 +74,7 @@ if [ -z "$IMAGE_TYPE" ] || [ -z "$PREPARED_BLUEPRINT" ] || [ -z "$OUTPUT_DIR" ] 
 fi
 
 # Build the image
-sudo "$IMAGE_BUILDER_CMD" build "$IMAGE_TYPE" \
+sudo $IMAGE_BUILDER_CMD build "$IMAGE_TYPE" \
   --blueprint "$PREPARED_BLUEPRINT" \
   --output-dir "$OUTPUT_DIR" \
   --cache "$CACHE_DIR" \

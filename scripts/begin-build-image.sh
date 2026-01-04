@@ -74,26 +74,12 @@ if [ -f /etc/redhat-release ]; then
     --image-name "$(basename "$BLUEPRINT_DIR")"
 else
   #Call the build-image script using podman
-  "$BUILD_IMAGE_SCRIPT" --image-builder-cmd "podman run --privileged -v ./build:/output -v '$BLUEPRINT_FILE':/'$(basename "$BLUEPRINT_FILE")' ghcr.io/osbuild/image-builder-cli:latest"\
-    --blueprint "$(basename "$BLUEPRINT_FILE")" \
+  "$BUILD_IMAGE_SCRIPT" --image-builder-cmd "podman run --privileged -v ./build:/output -v ./$BLUEPRINT_FILE:/'$(basename "$BLUEPRINT_FILE") ghcr.io/osbuild/image-builder-cli:latest" \
+    --blueprint "/$(basename "$BLUEPRINT_FILE")" \
     --output-dir "/output/$(basename "$BLUEPRINT_DIR")" \
     --cache-dir "/output/cache" \
     --arch "$ARCH" \
     --distro "$DISTRO" \
     --base-image "$IMAGE_TYPE" \
     --image-name "$(basename "$BLUEPRINT_DIR")"
-
-  #sudo podman run --privileged \
-  # -v ./build:/output \
-  # -v ./build/test/test.toml:/test.toml \
-  # ghcr.io/osbuild/image-builder-cli:latest \
-  # build \
-  # --distro fedora-43 \
-  # --arch x86_64 \
-  # --cache /output/cache \
-  # --progress=verbose \
- #  --blueprint=/test.toml \
- #  --output-dir=/output/test2 \
- #  --output-name=test2 \
- #  minimal-installer
 fi
