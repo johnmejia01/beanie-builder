@@ -42,6 +42,7 @@ if [ "$(uname -s)" == "Linux" ]; then
                 libvirt-daemon-system \
                 libvirt-clients \
                 virt-manager \
+                ovmf \
                 jq \
                 yq \
                 python3-pip \
