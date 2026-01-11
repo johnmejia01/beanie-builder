@@ -74,7 +74,7 @@ if [ -f /etc/redhat-release ]; then
     --image-name "$(basename "$BLUEPRINT_DIR")"
 else
   #Call the build-image script using podman
-  "$BUILD_IMAGE_SCRIPT" --image-builder-cmd "podman run --privileged -v ./build:/output -v ./$BLUEPRINT_FILE:/'$(basename "$BLUEPRINT_FILE") ghcr.io/osbuild/image-builder-cli:latest" \
+  "$BUILD_IMAGE_SCRIPT" --image-builder-cmd "podman run --privileged -v ./build:/output -v ./$BLUEPRINT_FILE:/$(basename "$BLUEPRINT_FILE") ghcr.io/osbuild/image-builder-cli:latest" \
     --blueprint "/$(basename "$BLUEPRINT_FILE")" \
     --output-dir "/output/$(basename "$BLUEPRINT_DIR")" \
     --cache-dir "/output/cache" \
