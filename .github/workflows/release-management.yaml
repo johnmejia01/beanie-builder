@@ -1,0 +1,49 @@
+name: Release Management
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened, closed ]
+
+jobs:
+  check-changelog:
+    if: github.event.pull_request.merged == false && github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure CHANGELOG.md is updated
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if ! git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q 'CHANGELOG.md'; then
+            echo "Error: CHANGELOG.md must be updated in this PR."
+            exit 1
+          fi
+          echo "Success: CHANGELOG.md update detected."
+
+  create-tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Version and Push Tag
+        run: |
+          # this will extract the version from changelog file
+          VERSION=$(grep -m 1 -oP '(?<=\[)v?[0-9]+\.[0-9]+\.[0-9]+[^\]]*' CHANGELOG.md)
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists. Skipping."
+          else
+            git tag $VERSION
+            git push origin $VERSION
+          fi
