@@ -9,7 +9,7 @@ create_blueprint_script := "scripts/create-blueprint.sh"
 begin_build_image_script := "scripts/begin-build-image.sh"
 begin_validate_blueprint_config_script := "scripts/begin-validate-blueprint-config.sh"
 clean_script := "scripts/clean.sh"
-prep_vm_script := "scripts/prep-vm.sh"
+begin_prep_vm_script := "scripts/begin-prep-vm.sh"
 run_image_script := "scripts/run-image.sh"
 
 # Default recipe
@@ -72,7 +72,7 @@ clean blueprint:
 # Run the image
 run-image blueprint:
     #!/usr/bin/env bash
-    {{prep_vm_script}} --blueprint-dir "build/{{blueprint}}"
+    {{begin_prep_vm_script}} --blueprint-dir "build/{{blueprint}}"
     {{run_image_script}} --blueprint-dir "build/{{blueprint}}"
 
 # Show help message
