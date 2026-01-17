@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+eval "$(mise activate bash)"
 
 usage() {
   echo "Usage: $0 [OPTIONS]" >&2

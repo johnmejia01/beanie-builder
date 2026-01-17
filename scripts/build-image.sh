@@ -74,9 +74,7 @@ if [ -z "$IMAGE_TYPE" ] || [ -z "$PREPARED_BLUEPRINT" ] || [ -z "$OUTPUT_DIR" ] 
 fi
 
 # Build the image
-echo "Starting image build..."
-BUILD_START_TIME=$(date +%s)
-sudo "$IMAGE_BUILDER_CMD" build "$IMAGE_TYPE" \
+sudo $IMAGE_BUILDER_CMD build "$IMAGE_TYPE" \
   --blueprint "$PREPARED_BLUEPRINT" \
   --output-dir "$OUTPUT_DIR" \
   --cache "$CACHE_DIR" \
