@@ -21,6 +21,14 @@ TEST_TMPDIR=""
 
 # Setup function run before each test
 setup() {
+  # Activate mise if available
+  # Temporarily disable 'set -u' to avoid errors with unbound variables from mise
+  set +u
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)" 2>/dev/null || true
+  fi
+  set -u
+
   # Create a temporary directory for each test
   TEST_TMPDIR=$(mktemp -d)
   export TEST_TMPDIR
@@ -70,6 +78,11 @@ run_script() {
   shift
   local script_path
   script_path=$(get_script_path "$script_name")
+  
+  # Ensure PROMPT_COMMAND is set to avoid unbound variable errors with set -u
+  # This is needed because mise activation may set it, but scripts with set -u need it defined
+  export PROMPT_COMMAND="${PROMPT_COMMAND:-}"
+  
   run "$script_path" "$@"
 }
 
