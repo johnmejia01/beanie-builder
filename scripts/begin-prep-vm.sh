@@ -44,7 +44,7 @@ if [ "$(uname -s)" == "Linux" ]; then
         # Call the prep-vm script
         "$PREP_VM_SCRIPT" --blueprint-dir "$BLUEPRINT_DIR"
     else
-        "$PREP_VM_SCRIPT" --blueprint-dir "$BLUEPRINT_DIR" --pflash-path "/usr/share/ovmf/OVMF_CODE.fd"
+        "$PREP_VM_SCRIPT" --blueprint-dir "$BLUEPRINT_DIR" --pflash-path "/usr/share/ovmf/OVMF.fd"
     fi
 else
     echo "Error: Unsupported operating system"
