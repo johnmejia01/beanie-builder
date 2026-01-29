@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-eval "$(mise activate bash)"
+# Activate mise only if available (e.g. Fedora); on Ubuntu/Debian tools may be installed via apt
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash)"
+fi
 
 usage() {
   echo "Usage: $0 [OPTIONS]" >&2
