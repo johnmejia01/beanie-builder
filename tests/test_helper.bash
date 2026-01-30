@@ -3,6 +3,9 @@
 # Test helper functions for Beanie Builder tests
 #
 
+# run_script supports expected exit code (e.g. -127); requires Bats 1.5.0+
+bats_require_minimum_version 1.5.0
+
 # Note: This test helper provides its own assertion functions
 # If you have bats-assert, bats-support, and bats-file installed,
 # you can uncomment the lines below to use them instead.
@@ -73,7 +76,13 @@ get_script_path() {
 }
 
 # Helper function to run script with arguments
+# Optional first arg: expected exit code (e.g. -127) to silence Bats BW01 when we expect non-zero
 run_script() {
+  local expected_status=""
+  if [[ "$1" == -*[0-9]* ]]; then
+    expected_status="$1"
+    shift
+  fi
   local script_name="$1"
   shift
   local script_path
@@ -83,7 +92,14 @@ run_script() {
   # This is needed because mise activation may set it, but scripts with set -u need it defined
   export PROMPT_COMMAND="${PROMPT_COMMAND:-}"
   
-  run "$script_path" "$@"
+  # Set SKIP_SUDO=1 for tests to avoid requiring sudo
+  export SKIP_SUDO="${SKIP_SUDO:-1}"
+  
+  if [ -n "$expected_status" ]; then
+    run $expected_status "$script_path" "$@"
+  else
+    run "$script_path" "$@"
+  fi
 }
 
 # Helper function to create a test blueprint config

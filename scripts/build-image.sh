@@ -76,8 +76,20 @@ fi
 echo "Starting image build..."
 BUILD_START_TIME=$(date +%s)
 
+# Determine if sudo is needed
+# Skip sudo if:
+# 1. SKIP_SUDO is set (for testing)
+# 2. IMAGE_BUILDER_CMD already contains "sudo"
+# 3. IMAGE_BUILDER_CMD starts with "podman" (podman doesn't need sudo)
+USE_SUDO="sudo"
+FIRST_WORD="${IMAGE_BUILDER_CMD%% *}"
+if [ "${SKIP_SUDO:-}" = "1" ] || \
+   [[ "$IMAGE_BUILDER_CMD" == *"sudo"* ]]; then
+  USE_SUDO=""
+fi
+
 # Build the image
-sudo $IMAGE_BUILDER_CMD build "$IMAGE_TYPE" \
+$USE_SUDO $IMAGE_BUILDER_CMD build "$IMAGE_TYPE" \
   --blueprint "$PREPARED_BLUEPRINT" \
   --output-dir "$OUTPUT_DIR" \
   --cache "$CACHE_DIR" \
