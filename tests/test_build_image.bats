@@ -132,9 +132,9 @@ load test_helper
     skip "image-builder is available, would require sudo mocking"
   fi
   
-  # Without image-builder, the script will fail when trying to execute it
-  # But we can verify it gets to that point by checking it doesn't fail on parameter validation
-  run_script "build-image.sh" \
+  # Without image-builder, the script will fail with 127 (command not found) when trying to execute it
+  # Use -127 so Bats doesn't warn about unexpected exit code
+  run_script -127 "build-image.sh" \
     --base-image "minimal-installer" \
     --blueprint "blueprint.toml" \
     --output-dir "output" \
@@ -156,14 +156,27 @@ load test_helper
   # Create a mock image-builder command
   cat > "mock-image-builder" <<'EOF'
 #!/usr/bin/env bash
-echo "Mock image-builder called"
+echo "Mock image-builder called with custom command"
+exit 1
 EOF
   chmod +x "mock-image-builder"
   PATH="$TEST_TMPDIR:$PATH"
   
-  # This test would require mocking sudo, which is complex
-  # For now, we'll just verify the parameter is accepted
-  skip "Requires sudo mocking to test fully"
+  run_script "build-image.sh" \
+    --image-builder-cmd "mock-image-builder" \
+    --base-image "minimal-installer" \
+    --blueprint "blueprint.toml" \
+    --output-dir "output" \
+    --cache-dir "cache" \
+    --arch "x86_64" \
+    --distro "fedora-43" \
+    --image-name "test"
+  
+  # Verify the custom command was used (not the default)
+  assert_output --partial "Mock image-builder called with custom command"
+  
+  # Script should fail because mock exits with error
+  assert_failure
 }
 
 @test "build-image: decompresses minimal-raw-zst image type" {
@@ -211,11 +224,12 @@ EOF
     skip "image-builder is available, skipping to avoid actual execution"
   fi
   
-  # Create a mock image-builder that just exits successfully
+  # Create a mock image-builder that fails (to simulate build failure)
+  # This allows us to verify parameter validation passed without requiring actual image-builder execution
   cat > "mock-image-builder" <<'EOF'
 #!/usr/bin/env bash
 echo "Mock image-builder called"
-exit 0
+exit 1
 EOF
   chmod +x "mock-image-builder"
   
@@ -232,17 +246,19 @@ EOF
     --distro "fedora-43" \
     --image-name "test"
   
-  # Should fail when trying to execute with sudo (since sudo won't find our mock in PATH)
-  # But it should have passed parameter validation
-  # We verify this by checking it doesn't fail with "Missing required parameters"
+  # Should have passed parameter validation (no "Missing required parameters" error)
+  # The script should fail when executing the mock command, not on parameter validation
+  # This confirms all parameters were accepted
   if [[ "$output" == *"Missing required parameters"* ]]; then
     echo "Unexpected: Missing required parameters error"
     return 1
   fi
   
-  # The script should fail when trying to run sudo, not on parameter validation
-  # This confirms all parameters were accepted
-  [ $status -ne 0 ]
+  # Verify the mock was called (confirms script got past parameter validation)
+  assert_output --partial "Mock image-builder called"
+  
+  # Script should fail because mock exits with error
+  assert_failure
 }
 
 @test "build-image: handles relative and absolute paths correctly" {
@@ -256,11 +272,12 @@ EOF
     skip "image-builder is available, skipping to avoid actual execution"
   fi
   
-  # Create a mock image-builder that just exits successfully
+  # Create a mock image-builder that fails (to simulate build failure)
+  # This allows us to verify parameter validation passed without requiring actual image-builder execution
   cat > "mock-image-builder" <<'EOF'
 #!/usr/bin/env bash
 echo "Mock image-builder called"
-exit 0
+exit 1
 EOF
   chmod +x "mock-image-builder"
   
@@ -278,14 +295,16 @@ EOF
     --distro "fedora-43" \
     --image-name "test"
   
-  # Should not fail on parameter validation
+  # Should have passed parameter validation (no "Missing required parameters" error)
   if [[ "$output" == *"Missing required parameters"* ]]; then
     echo "Unexpected: Missing required parameters error"
     return 1
   fi
   
-  # The script should fail when trying to run sudo, not on parameter validation
-  # This confirms all parameters were accepted
-  [ $status -ne 0 ]
+  # Verify the mock was called (confirms script got past parameter validation)
+  assert_output --partial "Mock image-builder called"
+  
+  # Script should fail because mock exits with error
+  assert_failure
 }
 

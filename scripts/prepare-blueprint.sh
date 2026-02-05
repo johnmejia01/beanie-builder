@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+# Activate mise only if available (e.g. Fedora); on Ubuntu/Debian tomlq/yq may be installed via apt
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash)"
+fi
 
 if [ "$#" -lt 1 ]; then
   echo "Usage: $0 <blueprint-path> [output-path]" >&2
@@ -22,6 +26,14 @@ tomlq_cmd=(tomlq -t)
 
 run_tomlq() {
   "${tomlq_cmd[@]}" "$@"
+}
+
+# In-place edit: works with both kislyuk/tomlq (Ubuntu/Debian) and Mike Farah yq's tomlq (Fedora).
+# kislyuk/tomlq only allows -i with -y/-Y, so we use redirect+mv instead of -i.
+run_tomlq_in_place() {
+  local file="${*: -1}"
+  local args=("${@:1:$#-1}")
+  "${tomlq_cmd[@]}" "${args[@]}" "$file" > "$file.new" && mv "$file.new" "$file"
 }
 
 BLUEPRINT_SOURCE="$1"
@@ -68,7 +80,7 @@ fi
 
 # Initialize customizations structure
 if [[ -n "$IMAGE_TYPE_VALUE" ]] && [[ "$IMAGE_TYPE_VALUE" == *"installer"* ]]; then
-  run_tomlq -i '
+  run_tomlq_in_place '
     .customizations = (.customizations // {}) |
     .customizations.services = (.customizations.services // {}) |
     .customizations.files = (.customizations.files // []) |
@@ -76,7 +88,7 @@ if [[ -n "$IMAGE_TYPE_VALUE" ]] && [[ "$IMAGE_TYPE_VALUE" == *"installer"* ]]; t
     .customizations.installer.kickstart = (.customizations.installer.kickstart // {})
   ' "$TMPFILE"
 else
-  run_tomlq -i '
+  run_tomlq_in_place '
     .customizations = (.customizations // {}) |
     .customizations.services = (.customizations.services // {}) |
     .customizations.files = (.customizations.files // [])
@@ -93,7 +105,7 @@ append_file() {
 
   data="$(cat "$src")"
 
-  run_tomlq -i --arg path "$dest_path" --arg data "$data" --arg mode "$mode" '
+  run_tomlq_in_place --arg path "$dest_path" --arg data "$data" --arg mode "$mode" '
     .customizations.files =
       (((.customizations.files // []) | map(select(.path != $path))) + [{path: $path, mode: $mode, data: $data}])
   ' "$TMPFILE"
@@ -102,7 +114,7 @@ append_file() {
 enable_service() {
   local service_name="$1"
 
-  run_tomlq -i --arg svc "$service_name" '
+  run_tomlq_in_place --arg svc "$service_name" '
     .customizations.services.enabled =
       ((.customizations.services.enabled // []) | (if index($svc) == null then . + [$svc] else . end))
   ' "$TMPFILE"
@@ -192,7 +204,7 @@ $KICKSTART_CONTENT"
     fi
     
     # Append to blueprint
-    run_tomlq -i --arg ks "$KICKSTART_CONTENT" '
+    run_tomlq_in_place --arg ks "$KICKSTART_CONTENT" '
       .customizations.installer.kickstart.contents = $ks
     ' "$TMPFILE"
   fi

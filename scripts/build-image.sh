@@ -73,8 +73,23 @@ if [ -z "$IMAGE_TYPE" ] || [ -z "$PREPARED_BLUEPRINT" ] || [ -z "$OUTPUT_DIR" ] 
   usage
 fi
 
+echo "Starting image build..."
+BUILD_START_TIME=$(date +%s)
+
+# Determine if sudo is needed
+# Skip sudo if:
+# 1. SKIP_SUDO is set (for testing)
+# 2. IMAGE_BUILDER_CMD already contains "sudo"
+# 3. IMAGE_BUILDER_CMD starts with "podman" (podman doesn't need sudo)
+USE_SUDO="sudo"
+FIRST_WORD="${IMAGE_BUILDER_CMD%% *}"
+if [ "${SKIP_SUDO:-}" = "1" ] || \
+   [[ "$IMAGE_BUILDER_CMD" == *"sudo"* ]]; then
+  USE_SUDO=""
+fi
+
 # Build the image
-sudo "$IMAGE_BUILDER_CMD" build "$IMAGE_TYPE" \
+$USE_SUDO $IMAGE_BUILDER_CMD build "$IMAGE_TYPE" \
   --blueprint "$PREPARED_BLUEPRINT" \
   --output-dir "$OUTPUT_DIR" \
   --cache "$CACHE_DIR" \
@@ -82,6 +97,22 @@ sudo "$IMAGE_BUILDER_CMD" build "$IMAGE_TYPE" \
   --distro "$DISTRO" \
   --output-name "$IMAGE_NAME" \
   --progress=verbose
+BUILD_END_TIME=$(date +%s)
+BUILD_DURATION=$((BUILD_END_TIME - BUILD_START_TIME))
+
+# Calculate hours, minutes, and seconds
+BUILD_HOURS=$((BUILD_DURATION / 3600))
+BUILD_MINUTES=$(((BUILD_DURATION % 3600) / 60))
+BUILD_SECONDS=$((BUILD_DURATION % 60))
+
+# Format and display the build time
+if [ $BUILD_HOURS -gt 0 ]; then
+  echo "Build completed in ${BUILD_HOURS}h ${BUILD_MINUTES}m ${BUILD_SECONDS}s"
+elif [ $BUILD_MINUTES -gt 0 ]; then
+  echo "Build completed in ${BUILD_MINUTES}m ${BUILD_SECONDS}s"
+else
+  echo "Build completed in ${BUILD_SECONDS}s"
+fi
 
 # Decompress if needed
 if [ "$IMAGE_TYPE" == "minimal-raw-zst" ]; then

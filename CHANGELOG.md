@@ -7,6 +7,15 @@ This project follows the principles of
 and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [v0.2.0-alpha.2] - 2025-01-30
+### Added
+- Support for the tool to run on Debian/Ubuntu-based Linux distro.
+- Build duration tracking to `build-image.sh`
+    - Captures start and end times for image builds
+    - Displays formatted build time (hours, minutes, seconds)
+### Changed
+- Updated BATS Test Suites to support hosts running on Debian/Ubuntu-based Linux distro.
+
 
 ## [v0.1.0-alpha.2] - 2025-12-28
 

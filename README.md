@@ -15,7 +15,7 @@ Beanie Builder is a tool for building custom OS images using [OSBuild](https://w
 
 ## Prerequisites
 
-- Host must be running on a Fedora or other RHEL-based Linux distribution OS.
+- Host must be running on a Fedora or other RHEL-based Linux distribution OS, or Debian-based Linux distribution OS such as Ubuntu, Debian, etc.
 - sudo/root access for installing dependencies
 - `just` command runner (installed during setup)
 

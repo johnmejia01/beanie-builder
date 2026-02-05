@@ -2,6 +2,8 @@
 #
 # Tests for prepare-blueprint.sh script
 #
+# Note: mise version manager is activated in test_helper.bash setup()
+# This ensures tools like tomlq and yq are available in the correct versions
 
 load test_helper
 
@@ -47,6 +49,13 @@ load test_helper
 }
 
 @test "prepare-blueprint: creates prepared blueprint in build directory" {
+  # Ensure mise is activated (already done in test_helper setup, but verify tools are available)
+  set +u
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)" 2>/dev/null || true
+  fi
+  set -u
+  
   if ! command -v tomlq >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1; then
     skip "tomlq or yq not available"
   fi
@@ -61,6 +70,13 @@ load test_helper
 }
 
 @test "prepare-blueprint: includes services from blueprint-services directory" {
+  # Ensure mise is activated for tool availability
+  set +u
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)" 2>/dev/null || true
+  fi
+  set -u
+  
   if ! command -v tomlq >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1; then
     skip "tomlq or yq not available"
   fi
@@ -81,6 +97,13 @@ load test_helper
 }
 
 @test "prepare-blueprint: includes kickstart for installer image types" {
+  # Ensure mise is activated for tool availability
+  set +u
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)" 2>/dev/null || true
+  fi
+  set -u
+  
   if ! command -v tomlq >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1; then
     skip "tomlq or yq not available"
   fi
@@ -101,6 +124,13 @@ load test_helper
 }
 
 @test "prepare-blueprint: includes services from blueprint-services/all directory" {
+  # Ensure mise is activated for tool availability
+  set +u
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)" 2>/dev/null || true
+  fi
+  set -u
+  
   if ! command -v tomlq >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1; then
     skip "tomlq or yq not available"
   fi
@@ -121,6 +151,13 @@ load test_helper
 }
 
 @test "prepare-blueprint: preserves original blueprint packages" {
+  # Ensure mise is activated for tool availability
+  set +u
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)" 2>/dev/null || true
+  fi
+  set -u
+  
   if ! command -v tomlq >/dev/null 2>&1 || ! command -v yq >/dev/null 2>&1; then
     skip "tomlq or yq not available"
   fi
